@@ -47,7 +47,7 @@ const SaleModal: React.FC<SaleModalProps> = ({ address, user, onClose, onSave, o
     (receiptMethod === 'PAPER'));
 
   const handleShowPreview = async () => {
-    if (!isFormValid) return;
+    if (!isFormValid || receiptMethod === 'PAPER') return;
     setIsPreviewMode(true);
     
     if (isOnline) {
@@ -349,14 +349,25 @@ const SaleModal: React.FC<SaleModalProps> = ({ address, user, onClose, onSave, o
               </div>
 
               <div className="pt-4">
-                <button 
-                  onClick={handleShowPreview}
-                  disabled={!isFormValid}
-                  className={`w-full text-white text-lg font-black italic uppercase py-5 rounded-2xl shadow-xl flex items-center justify-center gap-3 transition-all ${isFormValid ? 'bg-green-600 active:scale-95 shadow-green-900/30' : 'bg-slate-800 text-slate-600 opacity-50 cursor-not-allowed'}`}
-                >
-                  <i className="fas fa-eye"></i>
-                  VÉRIFIER LE REÇU IA
-                </button>
+                {receiptMethod === 'PAPER' ? (
+                  <button 
+                    onClick={handleFinalSubmit}
+                    disabled={!isFormValid}
+                    className={`w-full text-white text-lg font-black italic uppercase py-5 rounded-2xl shadow-xl flex items-center justify-center gap-3 transition-all ${isFormValid ? 'bg-green-600 active:scale-95 shadow-green-900/30' : 'bg-slate-800 text-slate-600 opacity-50 cursor-not-allowed'}`}
+                  >
+                    <i className="fas fa-check-double"></i>
+                    VALIDER LE DON
+                  </button>
+                ) : (
+                  <button 
+                    onClick={handleShowPreview}
+                    disabled={!isFormValid}
+                    className={`w-full text-white text-lg font-black italic uppercase py-5 rounded-2xl shadow-xl flex items-center justify-center gap-3 transition-all ${isFormValid ? 'bg-green-600 active:scale-95 shadow-green-900/30' : 'bg-slate-800 text-slate-600 opacity-50 cursor-not-allowed'}`}
+                  >
+                    <i className="fas fa-eye"></i>
+                    VÉRIFIER LE REÇU IA
+                  </button>
+                )}
               </div>
             </div>
           ) : (
