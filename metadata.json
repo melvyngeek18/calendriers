@@ -1,0 +1,7 @@
+{
+  "name": "FireCal Manager",
+  "description": "Application de gestion de tournée pour les calendriers de pompiers. Cartographie, saisie rapide des dons et tableaux de bord.",
+  "requestFramePermissions": [
+    "geolocation"
+  ]
+}
