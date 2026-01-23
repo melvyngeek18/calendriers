@@ -81,7 +81,6 @@ const LoginView: React.FC<{ onLogin: (user: User) => void, sectors: Sector[] }> 
   const [lastName, setLastName] = useState('');
   const [firstName, setFirstName] = useState('');
   const [role, setRole] = useState<UserRole>(UserRole.PORTEUR);
-  const [sectorId, setSectorId] = useState<string>('');
   const [logo, setLogo] = useState<string | undefined>(undefined);
   const [password, setPassword] = useState('');
   const [existingProfile, setExistingProfile] = useState<User | null>(null);
@@ -99,7 +98,6 @@ const LoginView: React.FC<{ onLogin: (user: User) => void, sectors: Sector[] }> 
         setFirstName(u.firstName || '');
         setRole(u.role || UserRole.PORTEUR);
         if (u.rescueCenterLogo) setLogo(u.rescueCenterLogo);
-        if (u.sectorId) setSectorId(u.sectorId);
       } catch (e) { console.error(e); }
     } else { setIsCreatingNew(true); }
   }, []);
@@ -123,7 +121,7 @@ const LoginView: React.FC<{ onLogin: (user: User) => void, sectors: Sector[] }> 
   const submitCreation = () => {
     if (rescueCenter && lastName && firstName) {
       if (role === UserRole.ADMIN) localStorage.setItem('firecal_admin_pass', password);
-      onLogin({ id: Date.now().toString(), rescueCenter, lastName, firstName, role, rescueCenterLogo: logo, sectorId: role !== UserRole.ADMIN ? sectorId : undefined });
+      onLogin({ id: Date.now().toString(), rescueCenter, lastName, firstName, role, rescueCenterLogo: logo });
     }
   };
 
@@ -141,11 +139,8 @@ const LoginView: React.FC<{ onLogin: (user: User) => void, sectors: Sector[] }> 
         <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">© 2024 FireCal - Tous droits réservés</span>
         <div className="w-10 h-10 rounded-xl overflow-hidden flex items-center justify-center bg-white dark:bg-slate-800 shadow-xl p-1 border border-slate-200 dark:border-slate-700">
            <svg viewBox="0 0 100 100" className="w-full h-full drop-shadow-md">
-              {/* S metal - simplified style */}
               <path d="M70,30 C70,15 30,15 30,35 C30,45 70,55 70,65 C70,85 30,85 30,70" fill="none" stroke="#475569" strokeWidth="14" strokeLinecap="round" />
-              {/* C blue */}
               <path d="M80,25 C90,40 90,60 80,75" fill="none" stroke="#0ea5e9" strokeWidth="14" strokeLinecap="round" />
-              {/* Flame orange */}
               <path d="M20,60 C25,45 35,40 45,55 C55,70 40,85 20,85 C35,80 30,65 20,60" fill="#f97316" />
            </svg>
         </div>
@@ -159,7 +154,7 @@ const LoginView: React.FC<{ onLogin: (user: User) => void, sectors: Sector[] }> 
         <div className="relative z-10 w-full max-w-sm">
           <div className="text-center mb-10">
             <h1 className="text-4xl font-black italic text-slate-900 dark:text-white uppercase tracking-tighter mb-2">FireCal</h1>
-            <p className="text-slate-500 text-[10px] font-bold uppercase tracking-[0.2em]">Retour en service</p>
+            <p className="text-slate-500 text-[10px] font-bold uppercase tracking-[0.2em]">Accès Caserne</p>
           </div>
           <div className="bg-white/80 dark:bg-slate-900/60 backdrop-blur-xl border border-slate-200 dark:border-slate-800 rounded-[32px] p-6 shadow-2xl mb-6 transform transition-all hover:scale-[1.02]">
             <div className="flex flex-col items-center">
@@ -169,7 +164,6 @@ const LoginView: React.FC<{ onLogin: (user: User) => void, sectors: Sector[] }> 
               <h2 className="text-2xl font-black text-slate-900 dark:text-white uppercase italic tracking-tighter">{existingProfile.firstName} {existingProfile.lastName}</h2>
               <div className="flex items-center gap-2 mt-2">
                 <span className={`px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest text-white ${existingProfile.role === UserRole.ADMIN ? 'bg-red-600' : existingProfile.role === UserRole.RESPONSABLE ? 'bg-fire-orange' : 'bg-blue-600'}`}>{existingProfile.role}</span>
-                <span className="text-[10px] font-bold text-slate-500 uppercase">{existingProfile.rescueCenter}</span>
               </div>
             </div>
             <div className="mt-8 space-y-4">
@@ -177,14 +171,14 @@ const LoginView: React.FC<{ onLogin: (user: User) => void, sectors: Sector[] }> 
                 <div className="animate-fade-in">
                   <label className="block text-center text-slate-400 text-[9px] font-black uppercase tracking-widest mb-2">Sécurité Admin</label>
                   <input type="password" autoFocus placeholder="Mot de passe" value={password} onChange={(e) => setPassword(e.target.value)} className="w-full bg-slate-50 dark:bg-slate-950/50 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-3 text-center font-bold text-slate-900 dark:text-white focus:outline-none focus:border-fire-orange" />
-                  <button onClick={handleAdminAuth} className="w-full mt-4 bg-slate-900 dark:bg-white text-white dark:text-slate-950 py-4 rounded-xl font-black uppercase text-sm tracking-wide shadow-lg">Déverrouiller</button>
+                  <button onClick={handleAdminAuth} className="w-full mt-4 bg-slate-900 dark:bg-white text-white dark:text-slate-900 py-4 rounded-xl font-black uppercase text-sm tracking-wide shadow-lg">Se Connecter</button>
                 </div>
               ) : (
-                <button onClick={() => onLogin(existingProfile)} className="w-full bg-blue-600 text-white py-4 rounded-xl font-black uppercase text-sm tracking-wide shadow-lg">Reprendre la tournée</button>
+                <button onClick={() => onLogin(existingProfile)} className="w-full bg-blue-600 text-white py-4 rounded-xl font-black uppercase text-sm tracking-wide shadow-lg">Ouvrir Session</button>
               )}
             </div>
           </div>
-          <button onClick={() => { setIsCreatingNew(true); setPassword(''); }} className="w-full text-center text-slate-400 hover:text-fire-orange text-[10px] font-black uppercase tracking-widest transition-colors">Nouveau profil ?</button>
+          <button onClick={() => { setIsCreatingNew(true); setPassword(''); }} className="w-full text-center text-slate-400 hover:text-fire-orange text-[10px] font-black uppercase tracking-widest transition-colors">Changer de Profil</button>
         </div>
         <Copyright />
       </div>
@@ -198,7 +192,7 @@ const LoginView: React.FC<{ onLogin: (user: User) => void, sectors: Sector[] }> 
           {logo ? <img src={logo} alt="Logo" className="w-full h-full object-cover" /> : <div className="flex flex-col items-center"><i className="fas fa-camera text-slate-500 text-xl"></i></div>}
           <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={handleLogoUpload} />
         </div>
-        <h1 className="text-4xl font-black italic text-slate-900 dark:text-white uppercase tracking-tighter">Création Profil</h1>
+        <h1 className="text-4xl font-black italic text-slate-900 dark:text-white uppercase tracking-tighter">Initialisation</h1>
       </div>
       <form onSubmit={handleCreateSubmit} className="space-y-3 max-w-sm mx-auto w-full relative z-10">
         <input required placeholder="Centre de Secours" value={rescueCenter} onChange={(e) => setRescueCenter(e.target.value)} className="w-full bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white rounded-2xl py-3.5 px-6 focus:outline-none text-sm font-bold" />
@@ -212,19 +206,29 @@ const LoginView: React.FC<{ onLogin: (user: User) => void, sectors: Sector[] }> 
           <button type="button" onClick={() => setRole(UserRole.RESPONSABLE)} className={`flex-1 z-10 text-[8px] font-black uppercase tracking-wider transition-colors ${role === UserRole.RESPONSABLE ? 'text-white' : 'text-slate-500'}`}>Chef</button>
           <button type="button" onClick={() => setRole(UserRole.ADMIN)} className={`flex-1 z-10 text-[8px] font-black uppercase tracking-wider transition-colors ${role === UserRole.ADMIN ? 'text-white' : 'text-slate-500'}`}>Admin</button>
         </div>
-        {role === UserRole.ADMIN && <input type="password" required placeholder="Définir mot de passe (admin)" value={password} onChange={(e) => setPassword(e.target.value)} className="w-full bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-900/50 text-red-900 dark:text-red-100 rounded-2xl py-3.5 px-6 focus:outline-none text-sm font-bold" />}
-        {role !== UserRole.ADMIN && (
-          <select required value={sectorId} onChange={(e) => setSectorId(e.target.value)} className="w-full bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white rounded-2xl py-3.5 px-6 focus:outline-none text-sm font-bold appearance-none">
-            <option value="">Sélectionner un secteur</option>
-            {sectors.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
-          </select>
-        )}
-        <button type="submit" className="w-full bg-slate-900 dark:bg-white text-white dark:text-slate-950 py-4 rounded-2xl font-black italic uppercase text-lg shadow-2xl mt-2">Démarrer</button>
+        {role === UserRole.ADMIN && <input type="password" required placeholder="Définir mot de passe" value={password} onChange={(e) => setPassword(e.target.value)} className="w-full bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-900/50 text-red-900 dark:text-red-100 rounded-2xl py-3.5 px-6 focus:outline-none text-sm font-bold" />}
+        <button type="submit" className="w-full bg-slate-900 dark:bg-white text-white dark:text-slate-950 py-4 rounded-2xl font-black italic uppercase text-lg shadow-2xl mt-2">Valider Profil</button>
       </form>
       <Copyright />
     </div>
   );
 };
+
+// --- No Sector View ---
+const NoSectorView: React.FC<{ onLogout: () => void }> = ({ onLogout }) => (
+  <div className="h-full w-full flex flex-col items-center justify-center p-8 text-center bg-slate-50 dark:bg-slate-950">
+    <div className="w-24 h-24 bg-red-100 dark:bg-red-900/20 text-red-600 rounded-full flex items-center justify-center text-4xl mb-6 shadow-xl animate-pulse">
+      <i className="fas fa-user-lock"></i>
+    </div>
+    <h1 className="text-3xl font-black italic text-slate-900 dark:text-white uppercase tracking-tighter mb-4">Accès Restreint</h1>
+    <p className="text-slate-500 text-sm font-bold leading-relaxed max-w-xs mb-10 uppercase">
+      Aucun secteur ne vous a été attribué par l'administrateur. Veuillez contacter votre responsable pour démarrer votre tournée.
+    </p>
+    <button onClick={onLogout} className="bg-slate-900 dark:bg-white text-white dark:text-slate-900 px-8 py-4 rounded-2xl font-black uppercase italic tracking-widest text-sm shadow-xl active:scale-95 transition-transform">
+      Changer de Profil
+    </button>
+  </div>
+);
 
 // --- Admin Manager View ---
 const AdminManagerView: React.FC<{
@@ -301,29 +305,47 @@ const AdminManagerView: React.FC<{
       {activeTab === 'team' && (
         <div className="space-y-6 animate-fade-in">
           <div className="bg-white dark:bg-slate-900/40 p-6 rounded-[32px] border border-slate-200 dark:border-slate-800 shadow-xl">
-            <h3 className="text-slate-500 text-[10px] font-black uppercase mb-4">Ajouter un membre</h3>
-            <form onSubmit={e => { e.preventDefault(); onAddTeamMember({ id: Date.now().toString(), firstName: newMemberFN, lastName: newMemberLN, role: newMemberRole, rescueCenter: user.rescueCenter }); setNewMemberFN(''); setNewMemberLN(''); }} className="grid grid-cols-1 md:grid-cols-4 gap-3 items-end">
-              <input required placeholder="Nom" value={newMemberLN} onChange={e => setNewMemberLN(e.target.value)} className="bg-slate-50 dark:bg-slate-950/50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-bold" />
-              <input required placeholder="Prénom" value={newMemberFN} onChange={e => setNewMemberFN(e.target.value)} className="bg-slate-50 dark:bg-slate-950/50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-bold" />
+            <h3 className="text-slate-500 text-[10px] font-black uppercase mb-4 italic">Ajouter un Effectif</h3>
+            <form onSubmit={e => { e.preventDefault(); onAddTeamMember({ id: Date.now().toString(), firstName: newMemberFN, lastName: newMemberLN, role: newMemberRole, rescueCenter: user.rescueCenter }); setNewMemberFN(''); setNewMemberLN(''); }} className="grid grid-cols-1 gap-3">
+              <div className="grid grid-cols-2 gap-3">
+                <input required placeholder="Nom" value={newMemberLN} onChange={e => setNewMemberLN(e.target.value)} className="bg-slate-50 dark:bg-slate-950/50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-bold" />
+                <input required placeholder="Prénom" value={newMemberFN} onChange={e => setNewMemberFN(e.target.value)} className="bg-slate-50 dark:bg-slate-950/50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-bold" />
+              </div>
               <select value={newMemberRole} onChange={e => setNewMemberRole(e.target.value as UserRole)} className="bg-slate-50 dark:bg-slate-950/50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-bold">
                 <option value={UserRole.PORTEUR}>Porteur</option>
                 <option value={UserRole.RESPONSABLE}>Responsable</option>
                 <option value={UserRole.ADMIN}>Administrateur</option>
               </select>
-              <button type="submit" className="bg-fire-orange text-white py-3 rounded-xl font-bold uppercase text-xs">Ajouter</button>
+              <button type="submit" className="bg-fire-orange text-white py-4 rounded-xl font-black uppercase text-xs shadow-lg shadow-fire-orange/20 italic">Enregistrer Effectif</button>
             </form>
           </div>
           <div className="space-y-3">
             {teamMembers.map(m => (
-              <div key={m.id} className="bg-white dark:bg-slate-900/40 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 flex justify-between items-center shadow-lg">
-                <div className="flex items-center gap-4">
-                  <div className="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center font-bold">{m.firstName[0]}{m.lastName[0]}</div>
-                  <div>
-                    <h4 className="font-bold text-slate-900 dark:text-white text-sm">{m.firstName} {m.lastName}</h4>
-                    <span className={`text-[9px] font-black uppercase px-2 py-0.5 rounded-full text-white ${m.role === UserRole.ADMIN ? 'bg-red-600' : m.role === UserRole.RESPONSABLE ? 'bg-fire-orange' : 'bg-blue-600'}`}>{m.role}</span>
+              <div key={m.id} className="bg-white dark:bg-slate-900/40 p-4 rounded-[24px] border border-slate-200 dark:border-slate-800 flex flex-col gap-4 shadow-lg">
+                <div className="flex justify-between items-center">
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center font-black italic text-slate-400 border border-slate-200 dark:border-slate-700">{m.firstName[0]}{m.lastName[0]}</div>
+                    <div>
+                      <h4 className="font-black italic uppercase tracking-tighter text-slate-900 dark:text-white text-md">{m.firstName} {m.lastName}</h4>
+                      <span className={`text-[8px] font-black uppercase px-2 py-0.5 rounded-full text-white ${m.role === UserRole.ADMIN ? 'bg-red-600' : m.role === UserRole.RESPONSABLE ? 'bg-fire-orange' : 'bg-blue-600'}`}>{m.role}</span>
+                    </div>
                   </div>
+                  <button onClick={() => onDeleteTeamMember(m.id)} className="w-8 h-8 rounded-full bg-red-100 dark:bg-red-900/20 text-red-500 active:scale-90"><i className="fas fa-trash text-[10px]"></i></button>
                 </div>
-                <button onClick={() => onDeleteTeamMember(m.id)} className="w-8 h-8 rounded-full bg-red-100 dark:bg-red-900/20 text-red-500"><i className="fas fa-trash text-xs"></i></button>
+                
+                {m.role !== UserRole.ADMIN && (
+                  <div className="pt-3 border-t border-slate-100 dark:border-slate-800/50">
+                    <label className="block text-[8px] font-black text-slate-400 uppercase mb-2">Secteur Désigné</label>
+                    <select 
+                      value={m.sectorId || ''} 
+                      onChange={e => onUpdateTeamMember({ ...m, sectorId: e.target.value || undefined })}
+                      className="w-full bg-slate-50 dark:bg-slate-950/50 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2.5 text-[10px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-300"
+                    >
+                      <option value="">-- Aucun secteur --</option>
+                      {sectors.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
+                    </select>
+                  </div>
+                )}
               </div>
             ))}
           </div>
@@ -344,7 +366,6 @@ const AdminManagerView: React.FC<{
             {sectors.map(sector => {
               const stats = getSectorStats(sector);
               const responsible = teamMembers.find(m => m.id === sector.responsableId);
-              const isLastSector = sectors.length <= 1;
               return (
                 <div key={sector.id} className="bg-white dark:bg-slate-900/40 rounded-[32px] border border-slate-200 dark:border-slate-800 p-6 shadow-xl animate-fade-in">
                   <div className="flex justify-between items-start mb-4">
@@ -361,14 +382,13 @@ const AdminManagerView: React.FC<{
                         </div>
                       )}
                       <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-                        Responsable : <span className="text-fire-orange">{responsible ? `${responsible.firstName} ${responsible.lastName}` : "Non assigné"}</span>
+                        Chef : <span className="text-fire-orange">{responsible ? `${responsible.firstName} ${responsible.lastName}` : "Non assigné"}</span>
                       </p>
                     </div>
                     <button 
-                      disabled={isLastSector}
-                      onClick={() => { if(confirm("Supprimer ce secteur ?")) onDeleteSector(sector.id); }} 
-                      className={`w-8 h-8 rounded-full flex items-center justify-center transition-all ${isLastSector ? 'bg-slate-100 dark:bg-slate-800 text-slate-300 dark:text-slate-600 cursor-not-allowed' : 'bg-red-50 dark:bg-red-900/20 text-red-500 active:scale-90'}`}
-                      title={isLastSector ? "Impossible de supprimer le dernier secteur" : "Supprimer ce secteur"}
+                      onClick={() => { if(confirm("Supprimer ce secteur et toutes ses données ?")) onDeleteSector(sector.id); }} 
+                      className="w-8 h-8 rounded-full flex items-center justify-center transition-all bg-red-50 dark:bg-red-900/20 text-red-500 active:scale-90 hover:bg-red-100 dark:hover:bg-red-900/40"
+                      title="Supprimer ce secteur"
                     >
                       <i className="fas fa-trash text-xs"></i>
                     </button>
@@ -391,7 +411,7 @@ const AdminManagerView: React.FC<{
 
                   <div className="space-y-4 pt-4 border-t border-slate-100 dark:border-slate-800">
                     <div>
-                      <label className="block text-[9px] font-black text-slate-400 uppercase mb-1">Assigner Responsable (Admin/Chef)</label>
+                      <label className="block text-[9px] font-black text-slate-400 uppercase mb-1">Affecter Responsable</label>
                       <select value={sector.responsableId || ''} onChange={e => handleAssignResponsable(sector.id, e.target.value)} className="w-full bg-slate-50 dark:bg-slate-950/50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold">
                         <option value="">-- Aucun --</option>
                         {teamMembers.filter(m => m.role === UserRole.RESPONSABLE || m.role === UserRole.ADMIN).map(m => (
@@ -400,9 +420,9 @@ const AdminManagerView: React.FC<{
                       </select>
                     </div>
                     <div>
-                      <label className="block text-[9px] font-black text-slate-400 uppercase mb-1">Rues ({sector.streets.length})</label>
+                      <label className="block text-[9px] font-black text-slate-400 uppercase mb-1">Rues du Secteur ({sector.streets.length})</label>
                       <div className="flex gap-2">
-                        <input list={`streets-dl-${sector.id}`} value={streetInputs[sector.id] || ''} onChange={e => setStreetInputs({ ...streetInputs, [sector.id]: e.target.value })} className="flex-1 bg-slate-50 dark:bg-slate-950/50 border border-slate-200 rounded-xl px-3 py-2 text-xs" placeholder="Rue de Rivoli, ..." />
+                        <input list={`streets-dl-${sector.id}`} value={streetInputs[sector.id] || ''} onChange={e => setStreetInputs({ ...streetInputs, [sector.id]: e.target.value })} className="flex-1 bg-slate-50 dark:bg-slate-950/50 border border-slate-200 rounded-xl px-3 py-2 text-xs" placeholder="Rue de..." />
                         <datalist id={`streets-dl-${sector.id}`}>{availableStreets.map(st => <option key={st} value={st} />)}</datalist>
                         <button onClick={() => handleAddStreets(sector.id)} className="bg-blue-600 text-white px-4 rounded-xl font-bold text-xs">OK</button>
                       </div>
@@ -433,6 +453,8 @@ const ListView: React.FC<{ addresses: AddressPoint[], sectors: Sector[], onMarke
         const streets = new Set(sector.streets);
         res = res.filter(a => streets.has(a.streetName));
       }
+    } else if (!isGlobalAdmin) {
+      return [];
     }
     if (filter !== 'ALL') res = res.filter(a => a.status === filter);
     return res.sort((a, b) => a.streetName.localeCompare(b.streetName));
@@ -450,7 +472,7 @@ const ListView: React.FC<{ addresses: AddressPoint[], sectors: Sector[], onMarke
         )}
         <div className="flex gap-2 border-t border-slate-100 dark:border-slate-800 pt-3">
           <button onClick={() => setFilter('ALL')} className={`flex-shrink-0 px-3 py-1.5 rounded-full text-[8px] font-black uppercase ${filter === 'ALL' ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-900' : 'bg-slate-100 dark:bg-slate-900'}`}>Tout</button>
-          {[VisitStatus.TODO, VisitStatus.DONE, VisitStatus.ABSENT].map(s => <button key={s} onClick={() => setFilter(s)} className={`flex-shrink-0 px-3 py-1.5 rounded-full text-[8px] font-black uppercase ${filter === s ? 'text-white' : 'text-slate-500 bg-slate-100 dark:bg-slate-900'}`} style={filter === s ? {backgroundColor: STATUS_COLORS[s]} : {}}>{STATUS_LABELS[s]}</button>)}
+          {[VisitStatus.TODO, VisitStatus.DONE, VisitStatus.ABSENT, VisitStatus.REFUSED].map(s => <button key={s} onClick={() => setFilter(s)} className={`flex-shrink-0 px-3 py-1.5 rounded-full text-[8px] font-black uppercase ${filter === s ? 'text-white' : 'text-slate-500 bg-slate-100 dark:bg-slate-900'}`} style={filter === s ? {backgroundColor: STATUS_COLORS[s]} : {}}>{STATUS_LABELS[s]}</button>)}
         </div>
       </div>
       <div className="flex-1 overflow-y-auto no-scrollbar p-6 space-y-2 pt-0 pb-32">
@@ -458,7 +480,7 @@ const ListView: React.FC<{ addresses: AddressPoint[], sectors: Sector[], onMarke
           <div key={a.id} onClick={() => onMarkerClick(a)} className="bg-white dark:bg-slate-900/40 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 flex justify-between items-center shadow-lg active:scale-95 transition-transform">
             <div className="flex items-center gap-4">
               <div className="w-10 h-10 rounded-xl flex items-center justify-center border-2" style={{ borderColor: STATUS_COLORS[a.status] + '40', color: STATUS_COLORS[a.status] }}>
-                <i className={`fas ${a.status === VisitStatus.DONE ? 'fa-check' : a.status === VisitStatus.ABSENT ? 'fa-clock' : 'fa-home'}`}></i>
+                <i className={`fas ${a.status === VisitStatus.DONE ? 'fa-check' : a.status === VisitStatus.ABSENT ? 'fa-clock' : a.status === VisitStatus.REFUSED ? 'fa-times' : 'fa-home'}`}></i>
               </div>
               <div>
                 <h3 className="font-black text-sm italic uppercase tracking-tighter text-slate-900 dark:text-white leading-tight">{a.streetNumber} {a.streetName}</h3>
@@ -583,7 +605,7 @@ const DashboardView: React.FC<{ sales: Sale[], addresses: AddressPoint[], user: 
             className="flex items-center gap-1.5 bg-slate-100 dark:bg-slate-800 hover:bg-fire-orange/10 transition-colors px-3 py-1.5 rounded-full border border-slate-200 dark:border-slate-700 active:scale-95"
           >
             <i className="fas fa-user-edit text-[10px] text-slate-500"></i>
-            <span className="text-[9px] font-black uppercase text-slate-600 dark:text-slate-400">Mon Profil</span>
+            <span className="text-[9px] font-black uppercase text-slate-600 dark:text-slate-400">Profil</span>
           </button>
         </div>
       </div>
@@ -594,7 +616,7 @@ const DashboardView: React.FC<{ sales: Sale[], addresses: AddressPoint[], user: 
           <p className="text-xl font-black text-slate-900 dark:text-white">{done}</p>
         </div>
         <div className="bg-white dark:bg-slate-900/40 p-4 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xl text-center">
-          <p className="text-[8px] font-black text-slate-400 uppercase mb-1">Total Caserne</p>
+          <p className="text-[8px] font-black text-slate-400 uppercase mb-1">Total</p>
           <p className="text-xl font-black text-green-600">{total}€</p>
         </div>
         <div className="bg-white dark:bg-slate-900/40 p-4 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xl text-center">
@@ -627,6 +649,7 @@ const App: React.FC = () => {
     }
     return null;
   });
+  
   const [theme, setTheme] = useState<'light' | 'dark'>(() => (localStorage.getItem('firecal_theme') as any) || 'dark');
   const [activeTab, setActiveTab] = useState<'map' | 'list' | 'stats' | 'admin'>('map');
   const [addresses, setAddresses] = useState<AddressPoint[]>(() => JSON.parse(localStorage.getItem('firecal_addresses') || JSON.stringify(MOCK_ADDRESSES)));
@@ -640,6 +663,21 @@ const App: React.FC = () => {
   const [isOnline, setIsOnline] = useState(navigator.onLine);
   const [isSyncing, setIsSyncing] = useState(false);
   const [toast, setToast] = useState<{ message: string, type: 'success' | 'info' | 'error' } | null>(null);
+
+  // Sync session with the latest Admin-assigned data for Porteurs/Responsables
+  useEffect(() => {
+    if (currentUser && currentUser.role !== UserRole.ADMIN) {
+      const match = teamMembers.find(m => 
+        m.firstName.toLowerCase() === currentUser.firstName.toLowerCase() && 
+        m.lastName.toLowerCase() === currentUser.lastName.toLowerCase()
+      );
+      if (match && match.sectorId !== currentUser.sectorId) {
+        const updated = { ...currentUser, sectorId: match.sectorId };
+        setCurrentUser(updated);
+        localStorage.setItem('firecal_user', JSON.stringify(updated));
+      }
+    }
+  }, [teamMembers]);
 
   useEffect(() => { if(currentUser) localStorage.setItem('firecal_user', JSON.stringify(currentUser)); }, [currentUser]);
   useEffect(() => localStorage.setItem('firecal_addresses', JSON.stringify(addresses)), [addresses]);
@@ -682,16 +720,24 @@ const App: React.FC = () => {
   const handleUpdateSector = (s: Sector) => setSectors(sectors.map(sec => sec.id === s.id ? s : sec));
   
   const handleDeleteSector = (id: string) => {
-    if (sectors.length <= 1) {
-      setToast({ message: "Impossible de supprimer le dernier secteur.", type: 'error' });
-      return;
+    setSectors(prev => prev.filter(s => s.id !== id));
+    setTeamMembers(prev => prev.map(m => m.sectorId === id ? { ...m, sectorId: undefined } : m));
+    
+    if (currentUser?.sectorId === id) {
+       const updatedUser = { ...currentUser, sectorId: undefined };
+       setCurrentUser(updatedUser);
+       localStorage.setItem('firecal_user', JSON.stringify(updatedUser));
     }
-    setSectors(sectors.filter(s => s.id !== id));
-    setTeamMembers(teamMembers.map(m => m.sectorId === id ? { ...m, sectorId: undefined } : m));
-    if (currentUser?.sectorId === id) setCurrentUser({ ...currentUser, sectorId: undefined });
+    
+    setToast({ message: "Secteur supprimé", type: 'info' });
   };
 
   if (!currentUser) return <LoginView onLogin={setCurrentUser} sectors={sectors} />;
+
+  // Restreindre l'accès si pas de secteur et pas admin
+  const hasSector = currentUser.role === UserRole.ADMIN || currentUser.sectorId;
+  if (!hasSector) return <NoSectorView onLogout={() => { localStorage.removeItem('firecal_user'); setCurrentUser(null); }} />;
+
   const canManage = hasPermission(currentUser, 'MANAGE_SETTINGS') || hasPermission(currentUser, 'VIEW_STATS_SECTOR');
 
   return (
@@ -727,8 +773,8 @@ const App: React.FC = () => {
         <nav className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border border-slate-200 dark:border-slate-800 h-20 rounded-[32px] shadow-2xl flex items-center justify-around px-2">
           <button onClick={() => setActiveTab('map')} className={`flex flex-col items-center justify-center w-14 h-14 ${activeTab === 'map' ? 'text-fire-orange scale-110' : 'text-slate-300 dark:text-slate-600'}`}><i className="fas fa-map-marked-alt text-xl mb-1"></i><span className="text-[7px] font-black uppercase">Carte</span></button>
           <button onClick={() => setActiveTab('list')} className={`flex flex-col items-center justify-center w-14 h-14 ${activeTab === 'list' ? 'text-fire-orange scale-110' : 'text-slate-300 dark:text-slate-600'}`}><i className="fas fa-route text-xl mb-1"></i><span className="text-[7px] font-black uppercase">Rues</span></button>
-          <button onClick={() => setActiveTab('stats')} className={`flex flex-col items-center justify-center w-14 h-14 ${activeTab === 'stats' ? 'text-fire-orange scale-110' : 'text-slate-300 dark:text-slate-600'}`}><i className="fas fa-chart-line text-xl mb-1"></i><span className="text-[7px] font-black uppercase">Données</span></button>
-          {canManage && <button onClick={() => setActiveTab('admin')} className={`flex flex-col items-center justify-center w-14 h-14 ${activeTab === 'admin' ? 'text-fire-orange scale-110' : 'text-slate-300 dark:text-slate-600'}`}><i className="fas fa-users-cog text-xl mb-1"></i><span className="text-[7px] font-black uppercase">{currentUser.role === UserRole.ADMIN ? 'Gestion' : 'Secteur'}</span></button>}
+          <button onClick={() => setActiveTab('stats')} className={`flex flex-col items-center justify-center w-14 h-14 ${activeTab === 'stats' ? 'text-fire-orange scale-110' : 'text-slate-300 dark:text-slate-600'}`}><i className="fas fa-chart-line text-xl mb-1"></i><span className="text-[7px] font-black uppercase">Synthèse</span></button>
+          {canManage && <button onClick={() => setActiveTab('admin')} className={`flex flex-col items-center justify-center w-14 h-14 ${activeTab === 'admin' ? 'text-fire-orange scale-110' : 'text-slate-300 dark:text-slate-600'}`}><i className="fas fa-users-cog text-xl mb-1"></i><span className="text-[7px] font-black uppercase">Gestion</span></button>}
         </nav>
       </div>
     </div>
